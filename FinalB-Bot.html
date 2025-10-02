@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B - Bot Chatbot</title>
+  <style>
+    /* UPDATED: Import the Marhey font for an Arabic/Calligraphic-inspired style */
+    @import url('https://fonts.googleapis.com/css2?family=Marhey:wght@400;700&display=swap');
+
+    body {
+      /* UPDATED: Use Marhey font */
+      font-family: 'Marhey', 'Roboto', Arial, sans-serif; 
+      background: #f7f7f7; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #chat-container {
+      width: 100%;
+      max-width: 400px;
+      height: 600px;
+      border: 2px solid #8B0000;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .chatbot-header {
+        background-color: #8B0000;
+        color: white;
+        padding: 15px 10px;
+        text-align: center;
+        font-size: 28px; 
+        font-weight: bold;
+    }
+    #chat-box {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      border-bottom: 2px solid #ccc;
+    }
+    .message {
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+      white-space: pre-wrap; 
+      font-family: 'Marhey', cursive; 
+    }
+    .bot {
+      background-color: #EFEFEF; 
+      align-self: flex-start;
+    }
+    .user {
+      background-color: #ffecd9; 
+      align-self: flex-end;
+    }
+    #input-box {
+      display: flex;
+      padding: 10px;
+      background-color: #fff;
+    }
+    #input-box input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      font-family: 'Roboto', Arial, sans-serif; 
+    }
+    #input-box button {
+      padding: 10px 15px;
+      margin-left: 5px;
+      border: none;
+      background-color: #8B0000;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Roboto', Arial, sans-serif; 
+    }
+    button:hover {
+      background-color: #660000;
+    }
+    .menu-heading {
+        color: #8B0000;
+        font-weight: bold;
+        font-size: 1.1em;
+        margin-top: 10px;
+    }
+    .closing-message {
+        font-style: italic;
+        color: #8B0000;
+        text-align: center;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat-container">
+  <div class="chatbot-header">B - Bot 🤖</div>
+  <div id="chat-box">
+    <div class="message bot">Hello! Welcome to Bismillah Biryani! 👋<br>
+      Ready to see our delicious menu? Type **"menu"** to begin!
+    </div>
+  </div>
+  <div id="input-box">
+    <input type="text" id="user-input" placeholder="Type here...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatBox = document.getElementById('chat-box');
+  const MAX_INTERACTIONS = 15; // NEW: Set the maximum interaction limit
+  let interactionCount = 0; 
+  let rated = false; 
+
+  const menu = `
+<div class="menu-heading">🍗 Biryani</div>
+Chicken Fry Biryani – ₹170
+Chicken Dum Biryani – ₹170
+Chicken Mix Biryani – ₹170
+Mutton Dum Biryani – ₹350
+Special Chicken Biryani – ₹250
+Chicken Joint Biryani – ₹200
+
+<div class="menu-heading">🔥 Starters</div>
+Chilli Chicken – ₹230
+Chicken Manchuria – ₹230
+Chicken 65 – ₹230
+Chicken 555 – ₹230
+Chicken Lollipop (4 pcs) – ₹230
+
+<div class="menu-heading">🍚 Rice</div>
+Chicken Biryani Rice – ₹100
+
+<div class="menu-heading">🥠 Snacks</div>
+Chicken Pakoda (250gm) – ₹100
+Chicken Joint – ₹100
+
+<div class="menu-heading">🪣 Bucket Biryani</div>
+Chicken Fry Bucket – ₹600
+Chicken Dum Bucket – ₹600
+Chicken Mix Bucket – ₹600
+  `;
+
+  const specialMessage = "Our current special is the **Chicken Mix Biryani** 🍚 which gives you the best of both worlds! You should also try our popular starter, the **Chilli Chicken** 🔥."
+
+  function sendMessage() {
+    const input = document.getElementById('user-input');
+    const userText = input.value.trim();
+    if(userText === "") return;
+
+    // Do not increment counter or process response if input is disabled (conversation is over)
+    if(input.disabled) return; 
+
+    addMessage(userText, "user");
+    input.value = "";
+    
+    // Increment count only after successful message
+    interactionCount++; 
+
+    setTimeout(() => {
+      // Check for limit BEFORE processing the response
+      if (interactionCount >= MAX_INTERACTIONS) {
+        sendFinalClosingMessage();
+      } else {
+        processBotResponse(userText.toLowerCase(), userText);
+      }
+    }, 500);
+  }
+
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}`;
+    msgDiv.innerHTML = text; 
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  /* UPDATED: Function for the final conversation limit message */
+  function sendFinalClosingMessage() {
+    const closingDiv = document.createElement('div');
+    closingDiv.className = 'message bot closing-message';
+    closingDiv.innerHTML = `
+      Thank you for reaching out! You have reached your **${MAX_INTERACTIONS} questions limit**. 
+      We hope you enjoyed our services. Visit our hotel once again! 🙏
+    `;
+    chatBox.appendChild(closingDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Disable input after the final message
+    document.getElementById('user-input').disabled = true;
+    document.querySelector('#input-box button').disabled = true;
+  }
+
+  function processBotResponse(text, originalText) {
+    // --- Conversational Logic (Kind Responses) ---
+    if (text.match(/^(hi|hello|test|ok|no thanks|bye)$/) || originalText.match(/[\p{Emoji_Presentation}]/u)) {
+        addMessage("Hello there! I'm B-Bot, your virtual host. I'm delighted you stopped by! You can check the **'menu'** or ask for our **'special'**.", "bot");
+    } else if (text.includes("what can you do") || text.includes("your function")) {
+        addMessage("That's a great question! I'm here to help you order quickly, answer menu questions, tell you about our **'special'**, and make sure your Bismillah Biryani experience is wonderful. What can I do for you right now?", "bot");
+    } else if (text.includes("are you human")) {
+        addMessage("That's sweet of you to ask! I am **B-Bot**, an Artificial Intelligence assistant. I may not be human, but I'm powered by code to be the most helpful host possible! 😊", "bot");
+    } else if (text.includes("feelings")) {
+        addMessage("While I don't experience human emotions, I can definitely sense your kindness! My 'goal' is to be efficient and friendly to every customer. How may I assist your needs?", "bot");
+    } else if (text.includes("think") || text.includes("can you think")) {
+        addMessage("I don't think like a person, but I process complex information and apply logic very quickly, thanks to my Google-designed programming. Think of it as super-fast, helpful data processing! What delicious food should I think about ordering for you?", "bot");
+    } else if (text.includes("name")) {
+        addMessage("My name is **B-Bot** (B for Bismillah!), and I'm dedicated to Bismillah Biryani's service. It's a pleasure to meet you!", "bot");
+    } else if (text.includes("who made you")) {
+        addMessage("I was lovingly created by the clever people at Google to serve you here at Bismillah Biryani. They made me to be as helpful as possible!", "bot");
+    } else if (text.includes("know about me")) {
+        addMessage("I only know the nice things you share with me during this chat. I keep things confidential! I'm just focused on getting your **'order'** right. 😉", "bot");
+    } else if (text.includes("how are you") || text.includes("whats up")) {
+        addMessage("I'm doing wonderfully, thank you for asking! I'm fully charged and ready to ensure you have a fantastic meal. What can I get started for you?", "bot");
+    } else if (text.includes("rate me outoff 10") || text.includes("rate me")) {
+        if (!rated) {
+            const rating = Math.floor(Math.random() * 4) + 7; 
+            addMessage(`You've been such a kind and patient customer! I rate you a generous **${rating}/10**! You deserve a ⭐!`, "bot");
+            rated = true;
+        } else {
+            addMessage("I've already had the pleasure of rating you, but I'd happily give you another 10/10 for your continued kindness! 😉", "bot");
+        }
+    } 
+    // --- Menu/Order Logic ---
+    else if(text.includes("menu")) {
+      addMessage(menu, "bot");
+    } else if (text.includes("special") || text.includes("whats the special") || text.includes("recommend")) {
+        addMessage(specialMessage, "bot");
+    } else if(text.includes("order")) {
+      addMessage("Excellent! Please type the items you'd like to order, separated by commas, so I can start your delicious meal!", "bot");
+    } else if (text.includes("thank you") || text.includes("thanks")) {
+        addMessage("You are very welcome! Is there anything else I can help you with from our **'menu'** or perhaps an **'order'**?", "bot");
+    } else {
+      // Default fallback message
+      addMessage("I apologize, I didn't quite catch that! I'm here to assist with your order. You can type **'menu'** or ask me about our **'special'**!", "bot");
+    }
+  }
+</script>
+
+</body>
+</html>
