@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>B - Bot Chatbot</title>
   <style>
-    /* UPDATED: Import the Marhey font for an Arabic/Calligraphic-inspired style */
     @import url('https://fonts.googleapis.com/css2?family=Marhey:wght@400;700&display=swap');
 
     body {
-      /* UPDATED: Use Marhey font */
-      font-family: 'Marhey', 'Roboto', Arial, sans-serif; 
-      background: #f7f7f7; 
+      font-family: 'Marhey', 'Roboto', Arial, sans-serif;
+      background: #f7f7f7;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,15 +18,14 @@
     }
     #chat-container {
       width: 100%;
-      max-width: 400px;
-      height: 600px;
-      border: 2px solid #8B0000;
-      border-radius: 10px;
+      height: 100vh; /* Full screen height */
+      border: none; /* remove border for clean fullscreen look */
+      border-radius: 0; /* no rounded corners in fullscreen */
       display: flex;
       flex-direction: column;
       overflow: hidden;
       background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: none; /* no shadow in fullscreen */
     }
     .chatbot-header {
         background-color: #8B0000;
@@ -106,7 +103,7 @@
 <body>
 
 <div id="chat-container">
-  <div class="chatbot-header">B - Bot 🤖</div>
+  <div class="chatbot-header">B - Bot</div>
   <div id="chat-box">
     <div class="message bot">Hello! Welcome to Bismillah Biryani! 👋<br>
       Ready to see our delicious menu? Type **"menu"** to begin!
@@ -120,7 +117,7 @@
 
 <script>
   const chatBox = document.getElementById('chat-box');
-  const MAX_INTERACTIONS = 15; // NEW: Set the maximum interaction limit
+  const MAX_INTERACTIONS = 15;
   let interactionCount = 0; 
   let rated = false; 
 
@@ -159,18 +156,13 @@ Chicken Mix Bucket – ₹600
     const input = document.getElementById('user-input');
     const userText = input.value.trim();
     if(userText === "") return;
-
-    // Do not increment counter or process response if input is disabled (conversation is over)
     if(input.disabled) return; 
 
     addMessage(userText, "user");
     input.value = "";
-    
-    // Increment count only after successful message
     interactionCount++; 
 
     setTimeout(() => {
-      // Check for limit BEFORE processing the response
       if (interactionCount >= MAX_INTERACTIONS) {
         sendFinalClosingMessage();
       } else {
@@ -187,7 +179,6 @@ Chicken Mix Bucket – ₹600
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  /* UPDATED: Function for the final conversation limit message */
   function sendFinalClosingMessage() {
     const closingDiv = document.createElement('div');
     closingDiv.className = 'message bot closing-message';
@@ -197,14 +188,11 @@ Chicken Mix Bucket – ₹600
     `;
     chatBox.appendChild(closingDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
-    
-    // Disable input after the final message
     document.getElementById('user-input').disabled = true;
     document.querySelector('#input-box button').disabled = true;
   }
 
   function processBotResponse(text, originalText) {
-    // --- Conversational Logic (Kind Responses) ---
     if (text.match(/^(hi|hello|test|ok|no thanks|bye)$/) || originalText.match(/[\p{Emoji_Presentation}]/u)) {
         addMessage("Hello there! I'm B-Bot, your virtual host. I'm delighted you stopped by! You can check the **'menu'** or ask for our **'special'**.", "bot");
     } else if (text.includes("what can you do") || text.includes("your function")) {
@@ -231,9 +219,7 @@ Chicken Mix Bucket – ₹600
         } else {
             addMessage("I've already had the pleasure of rating you, but I'd happily give you another 10/10 for your continued kindness! 😉", "bot");
         }
-    } 
-    // --- Menu/Order Logic ---
-    else if(text.includes("menu")) {
+    } else if(text.includes("menu")) {
       addMessage(menu, "bot");
     } else if (text.includes("special") || text.includes("whats the special") || text.includes("recommend")) {
         addMessage(specialMessage, "bot");
@@ -242,10 +228,18 @@ Chicken Mix Bucket – ₹600
     } else if (text.includes("thank you") || text.includes("thanks")) {
         addMessage("You are very welcome! Is there anything else I can help you with from our **'menu'** or perhaps an **'order'**?", "bot");
     } else {
-      // Default fallback message
       addMessage("I apologize, I didn't quite catch that! I'm here to assist with your order. You can type **'menu'** or ask me about our **'special'**!", "bot");
     }
   }
+
+  // Allow Enter key to send message
+  document.getElementById("user-input")
+    .addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
 </script>
 
 </body>
